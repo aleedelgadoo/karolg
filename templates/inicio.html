@@ -473,6 +473,7 @@
         .side-png { width: clamp(80px, 22vw, 130px); }
         .side-png-left  { left: -3vw; }
         .side-png-right { right: -3vw; }
+        #side-music { right: -12vw; width: clamp(60px, 18vw, 110px); }
     }
 
     /* ── SECCIONES SOLO PNG ── */
@@ -624,7 +625,7 @@
     <section id="music">
         <!-- Imagen lateral derecha de Latest Release -->
         {% if global_config and global_config.imagen_lateral_music %}
-        <div class="side-png side-png-right">
+        <div class="side-png side-png-right" id="side-music">
             <img src="{{ global_config.imagen_lateral_music }}" alt="Deco music">
         </div>
         {% endif %}
