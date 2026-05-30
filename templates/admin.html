@@ -242,6 +242,14 @@
                     <p class="img-label-small mt-1">Imagen de fondo de todo el hero</p>
                 </div>
                 <div class="img-upload-box">
+                    <label>Fondo 2 (fade al scroll)</label>
+                    {% if global_config and global_config.imagen_fondo_2 %}
+                        <img src="{{ global_config.imagen_fondo_2 }}" class="current-img" alt="Fondo 2 actual">
+                    {% endif %}
+                    <input type="file" name="imagen_fondo_2" class="form-control" accept="image/*">
+                    <p class="img-label-small mt-1">Se muestra al llegar al 50% de la página, con fade</p>
+                </div>
+                <div class="img-upload-box">
                     <label>Imagen título (PNG sin fondo)</label>
                     {% if global_config and global_config.imagen_titulo %}
                         <img src="{{ global_config.imagen_titulo }}" class="current-img" alt="Título actual">
@@ -303,6 +311,27 @@
                 {% endif %}
                 <input type="file" name="imagen_release" class="form-control" accept="image/*">
             </div>
+            <div class="img-upload-box mt-3" style="max-width:240px">
+                <label>Imagen lateral derecha (PNG sin fondo)</label>
+                {% if global_config and global_config.imagen_lateral_music %}
+                    <img src="{{ global_config.imagen_lateral_music }}" class="current-img" alt="Lateral music">
+                {% endif %}
+                <input type="file" name="imagen_lateral_music" class="form-control" accept="image/*">
+                <p class="img-label-small mt-1">Flota a la derecha de esta sección</p>
+            </div>
+        </div>
+
+        <!-- ── SECCIÓN PNG 1: entre Music y Tour ── -->
+        <div class="admin-card">
+            <h5>Sección decorativa · Entre Music y Tour</h5>
+            <div class="img-upload-box" style="max-width:300px">
+                <label>Imagen PNG sin fondo</label>
+                {% if global_config and global_config.imagen_png_sec1 %}
+                    <img src="{{ global_config.imagen_png_sec1 }}" class="current-img" alt="PNG sec 1">
+                {% endif %}
+                <input type="file" name="imagen_png_sec1" class="form-control" accept="image/*">
+                <p class="img-label-small mt-1">Se muestra centrada entre Latest Release y Tour Dates</p>
+            </div>
         </div>
 
         <!-- ── TOUR DATES ── -->
@@ -315,6 +344,27 @@
                 {% endif %}
                 <input type="file" name="imagen_tour" class="form-control" accept="image/*">
                 <p class="img-label-small mt-1">Subí la imagen completa tipo cuaderno con las fechas</p>
+            </div>
+            <div class="img-upload-box mt-3" style="max-width:240px">
+                <label>Imagen lateral izquierda (PNG sin fondo)</label>
+                {% if global_config and global_config.imagen_lateral_tour %}
+                    <img src="{{ global_config.imagen_lateral_tour }}" class="current-img" alt="Lateral tour">
+                {% endif %}
+                <input type="file" name="imagen_lateral_tour" class="form-control" accept="image/*">
+                <p class="img-label-small mt-1">Flota a la izquierda de esta sección</p>
+            </div>
+        </div>
+
+        <!-- ── SECCIÓN PNG 2: entre Tour y Merch ── -->
+        <div class="admin-card">
+            <h5>Sección decorativa · Entre Tour y Merch</h5>
+            <div class="img-upload-box" style="max-width:300px">
+                <label>Imagen PNG sin fondo</label>
+                {% if global_config and global_config.imagen_png_sec2 %}
+                    <img src="{{ global_config.imagen_png_sec2 }}" class="current-img" alt="PNG sec 2">
+                {% endif %}
+                <input type="file" name="imagen_png_sec2" class="form-control" accept="image/*">
+                <p class="img-label-small mt-1">Se muestra centrada entre Tour Dates y Merch</p>
             </div>
         </div>
 
@@ -337,6 +387,27 @@
                         <input type="file" name="imagen_merch_{{ i }}" class="form-control" accept="image/*">
                     </div>
                 {% endfor %}
+            </div>
+            <div class="img-upload-box mt-3" style="max-width:240px">
+                <label>Imagen lateral derecha (PNG sin fondo)</label>
+                {% if global_config and global_config.imagen_lateral_merch %}
+                    <img src="{{ global_config.imagen_lateral_merch }}" class="current-img" alt="Lateral merch">
+                {% endif %}
+                <input type="file" name="imagen_lateral_merch" class="form-control" accept="image/*">
+                <p class="img-label-small mt-1">Flota a la derecha de la sección Merch</p>
+            </div>
+        </div>
+
+        <!-- ── SECCIÓN PNG 3: después de Merch ── -->
+        <div class="admin-card">
+            <h5>Sección decorativa · Después de Merch</h5>
+            <div class="img-upload-box" style="max-width:300px">
+                <label>Imagen PNG sin fondo</label>
+                {% if global_config and global_config.imagen_png_sec3 %}
+                    <img src="{{ global_config.imagen_png_sec3 }}" class="current-img" alt="PNG sec 3">
+                {% endif %}
+                <input type="file" name="imagen_png_sec3" class="form-control" accept="image/*">
+                <p class="img-label-small mt-1">Se muestra centrada al final de la página, después del Merch</p>
             </div>
         </div>
 

@@ -145,6 +145,19 @@ class ConfiguracionGlobal(db.Model):
     imagen_perseguidora_2 = db.Column(db.String(500), nullable=True, default="")
     imagen_perseguidora_3 = db.Column(db.String(500), nullable=True, default="")
 
+    # Segundo fondo (fade al hacer scroll)
+    imagen_fondo_2        = db.Column(db.String(500), nullable=True, default="")
+
+    # Secciones PNG decorativas
+    imagen_png_sec1       = db.Column(db.String(500), nullable=True, default="")  # entre Music y Tour
+    imagen_png_sec2       = db.Column(db.String(500), nullable=True, default="")  # entre Tour y Merch
+    imagen_png_sec3       = db.Column(db.String(500), nullable=True, default="")  # después de Merch
+
+    # Imágenes laterales PNG por sección
+    imagen_lateral_music  = db.Column(db.String(500), nullable=True, default="")  # derecha de Latest Release
+    imagen_lateral_tour   = db.Column(db.String(500), nullable=True, default="")  # izquierda de Tour Dates
+    imagen_lateral_merch  = db.Column(db.String(500), nullable=True, default="")  # derecha de Merch
+
 # ==========================================
 # LOGIN / CONTEXT PROCESSOR
 # ==========================================
@@ -287,6 +300,26 @@ def actualizar_configuracion_global():
             eliminar_imagen_supabase(getattr(config, f'imagen_perseguidora{i}'))
             setattr(config, f'imagen_perseguidora{i}', url)
 
+    # Segundo fondo
+    url = procesar_imagen(request.files.get('imagen_fondo_2'))
+    if url:
+        eliminar_imagen_supabase(config.imagen_fondo_2)
+        config.imagen_fondo_2 = url
+
+    # Secciones PNG decorativas
+    for campo in ['imagen_png_sec1', 'imagen_png_sec2', 'imagen_png_sec3']:
+        url = procesar_imagen(request.files.get(campo))
+        if url:
+            eliminar_imagen_supabase(getattr(config, campo))
+            setattr(config, campo, url)
+
+    # Imágenes laterales por sección
+    for campo in ['imagen_lateral_music', 'imagen_lateral_tour', 'imagen_lateral_merch']:
+        url = procesar_imagen(request.files.get(campo))
+        if url:
+            eliminar_imagen_supabase(getattr(config, campo))
+            setattr(config, campo, url)
+
     db.session.commit()
     flash('Configuración actualizada con éxito.', 'success')
     return redirect(url_for('admin_dashboard'))
@@ -297,10 +330,10 @@ def actualizar_configuracion_global():
 
 ## Activar esto al hacer deploy:
 with app.app_context():
-     db.create_all()
+    db.create_all()
 
-
-"""if __name__ == '__main__':
+""""
+if __name__ == '__main__':
     with app.app_context():
         db.create_all()
 

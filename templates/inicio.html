@@ -30,6 +30,27 @@
             #f5c8d4 80%,
             #f8d4de 100%);
         {% endif %}
+        transition: opacity 0.8s ease;
+    }
+
+    .page-bg-2 {
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        {% if global_config and global_config.imagen_fondo_2 %}
+        background-image: url('{{ global_config.imagen_fondo_2 }}');
+        background-size: cover;
+        background-position: center top;
+        background-attachment: fixed;
+        {% else %}
+        background: linear-gradient(180deg,
+            #c8a8d8 0%,
+            #b894cc 20%,
+            #a880c0 40%,
+            #b894cc 60%,
+            #c8a8d8 80%,
+            #d4b8e0 100%);
+        {% endif %}
     }
 
     /* Textura de papel/lienzo sobre el fondo */
@@ -449,11 +470,66 @@
         .release-cover, .release-cover-placeholder { max-width: 240px; }
         .merch-item { width: 150px; }
         .spotify-bar { max-width: 100%; }
+        .side-png { display: none; }
     }
+
+    /* ── SECCIONES SOLO PNG ── */
+    .png-only-section {
+        position: relative;
+        padding: 60px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 300px;
+    }
+
+    .png-only-section img {
+        max-width: 700px;
+        width: 90%;
+        display: block;
+        filter: drop-shadow(0 8px 32px rgba(0,0,0,0.12));
+    }
+
+    .png-only-placeholder {
+        max-width: 500px;
+        width: 90%;
+        height: 200px;
+        background: rgba(255,255,255,0.25);
+        border: 2px dashed #c9879a;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Kalam', cursive;
+        color: #8a5060;
+        font-size: 0.9rem;
+    }
+
+    /* ── IMÁGENES LATERALES FLOTANTES ── */
+    .side-png {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: clamp(200px, 22vw, 380px);
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .side-png img {
+        width: 100%;
+        filter: drop-shadow(0 8px 32px rgba(0,0,0,0.18));
+    }
+
+    .side-png-left  { left: -2vw; }
+    .side-png-right { right: -2vw; }
+
+    /* Sections con relative para anclar side-png */
+    #tour, #merch, #music { position: relative; overflow: visible; }
 </style>
 
 <div class="page-wrapper">
-    <div class="page-bg"></div>
+    <div class="page-bg" id="pageBg1"></div>
+    <div class="page-bg-2"></div>
 
     <!-- ════════════════════════════════
          SECCIÓN 1: HERO
@@ -544,6 +620,12 @@
          SECCIÓN 2: LATEST RELEASE
     ════════════════════════════════ -->
     <section id="music">
+        <!-- Imagen lateral derecha de Latest Release -->
+        {% if global_config and global_config.imagen_lateral_music %}
+        <div class="side-png side-png-right">
+            <img src="{{ global_config.imagen_lateral_music }}" alt="Deco music">
+        </div>
+        {% endif %}
         <div class="container">
             <div class="row align-items-center justify-content-center g-5">
                 <div class="col-md-5 text-center text-md-start order-md-2">
@@ -580,9 +662,24 @@
     </section>
 
     <!-- ════════════════════════════════
+         SECCIÓN PNG 1: entre Music y Tour
+    ════════════════════════════════ -->
+    {% if global_config and global_config.imagen_png_sec1 %}
+    <section class="png-only-section">
+        <img src="{{ global_config.imagen_png_sec1 }}" alt="Sección decorativa 1">
+    </section>
+    {% endif %}
+
+    <!-- ════════════════════════════════
          SECCIÓN 3: TOUR DATES
     ════════════════════════════════ -->
     <section id="tour">
+        <!-- Imagen lateral izquierda de Tour Dates -->
+        {% if global_config and global_config.imagen_lateral_tour %}
+        <div class="side-png side-png-left">
+            <img src="{{ global_config.imagen_lateral_tour }}" alt="Deco tour">
+        </div>
+        {% endif %}
         <div class="container text-center">
             <h2 class="tour-title">
                 <span class="star-icon">✦</span>
@@ -600,9 +697,24 @@
     </section>
 
     <!-- ════════════════════════════════
+         SECCIÓN PNG 2: entre Tour y Merch
+    ════════════════════════════════ -->
+    {% if global_config and global_config.imagen_png_sec2 %}
+    <section class="png-only-section">
+        <img src="{{ global_config.imagen_png_sec2 }}" alt="Sección decorativa 2">
+    </section>
+    {% endif %}
+
+    <!-- ════════════════════════════════
          SECCIÓN 4: MERCH
     ════════════════════════════════ -->
     <section id="merch">
+        <!-- Imagen lateral derecha de Merch -->
+        {% if global_config and global_config.imagen_lateral_merch %}
+        <div class="side-png side-png-right">
+            <img src="{{ global_config.imagen_lateral_merch }}" alt="Deco merch">
+        </div>
+        {% endif %}
         <div class="container">
             <h2 class="merch-title">MERCH</h2>
             <div class="merch-grid">
@@ -623,6 +735,15 @@
             {% endif %}
         </div>
     </section>
+
+    <!-- ════════════════════════════════
+         SECCIÓN PNG 3: después de Merch
+    ════════════════════════════════ -->
+    {% if global_config and global_config.imagen_png_sec3 %}
+    <section class="png-only-section">
+        <img src="{{ global_config.imagen_png_sec3 }}" alt="Sección decorativa 3">
+    </section>
+    {% endif %}
 
 <!-- ── TEXTO MANUSCRITO FONDO ── -->
 <div style="
@@ -766,5 +887,24 @@
 {% endif %}
 
 </div><!-- /page-wrapper -->
+
+<script>
+// ── FONDO DUAL: fade al 50% del scroll ──
+(function() {
+    var bg1 = document.getElementById('pageBg1');
+    if (!bg1) return;
+    function updateBgFade() {
+        var scrolled = window.scrollY;
+        var total = document.body.scrollHeight - window.innerHeight;
+        if (total <= 0) return;
+        var pct = scrolled / total; // 0 a 1
+        // A partir del 50% (0.5) empieza a desvanecerse, completo a 70%
+        var opacity = 1 - Math.max(0, Math.min(1, (pct - 0.45) / 0.25));
+        bg1.style.opacity = opacity;
+    }
+    window.addEventListener('scroll', updateBgFade, { passive: true });
+    updateBgFade();
+})();
+</script>
 
 {% endblock %}
