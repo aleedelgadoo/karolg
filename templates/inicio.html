@@ -443,16 +443,16 @@
     /* ── NAVE ESPACIAL FLOTANTE ── */
     #nave-flotante, #nave-perseguidora {
         position: fixed;
-        width: 700px;
-        height: 700px;
+        width: 233px;
+        height: 233px;
         z-index: 10;
         pointer-events: none;
         will-change: transform;
     }
 
     #nave-perseguidora {
-        width: 600px;
-        height: 600px;
+        width: 200px;
+        height: 200px;
         z-index: 9;
     }
 
@@ -857,8 +857,8 @@
         histIdx = (histIdx + 1) % DELAY_FRAMES;
         var oldPos = posHistory[histIdx];
 
-        // Clamp nave dentro de pantalla (mitad del elemento = 350)
-        var naveHalf = 350;
+        // Clamp nave dentro de pantalla (mitad del elemento = 116)
+        var naveHalf = 116;
         var clampedNaveX = Math.max(naveHalf, Math.min(window.innerWidth  - naveHalf, naveX));
         var clampedNaveY = Math.max(naveHalf, Math.min(window.innerHeight - naveHalf, naveY));
         nave.style.left = (clampedNaveX - naveHalf) + 'px';
@@ -870,8 +870,8 @@
             var persTargetY = naveY - 700;
             persY = lerp(persY, persTargetY, 0.025);
 
-            // Clamp perseguidora dentro de pantalla (mitad del elemento = 300)
-            var persHalf = 300;
+            // Clamp perseguidora dentro de pantalla (mitad del elemento = 100)
+            var persHalf = 100;
             var clampedPersX = Math.max(persHalf, Math.min(window.innerWidth  - persHalf, persX));
             var clampedPersY = Math.max(persHalf, Math.min(window.innerHeight - persHalf, persY));
             persEl.style.left = (clampedPersX - persHalf) + 'px';
