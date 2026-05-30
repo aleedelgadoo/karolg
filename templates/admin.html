@@ -1,0 +1,409 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    .admin-wrap {
+        padding: 120px 20px 80px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .admin-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 2.8rem;
+        letter-spacing: 5px;
+        margin-bottom: 8px;
+    }
+
+    .admin-subtitle {
+        font-size: 0.72rem;
+        letter-spacing: 2px;
+        color: #888;
+        text-transform: uppercase;
+        margin-bottom: 50px;
+    }
+
+    .admin-card {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 6px;
+        padding: 30px 34px;
+        margin-bottom: 28px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+    }
+
+    .admin-card h5 {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 1.15rem;
+        letter-spacing: 3px;
+        color: #1a1a1a;
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f0e0e5;
+    }
+
+    .form-label {
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #555;
+        margin-bottom: 6px;
+    }
+
+    .form-control, .form-select {
+        font-size: 0.82rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px 14px;
+        transition: border-color 0.2s;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #c9879a;
+        box-shadow: 0 0 0 3px rgba(201,135,154,0.12);
+        outline: none;
+    }
+
+    .btn-save {
+        background: #1a1a1a;
+        color: #fff;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 12px 32px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-top: 10px;
+    }
+
+    .btn-save:hover { background: #333; }
+
+    .current-img {
+        max-height: 80px;
+        max-width: 200px;
+        object-fit: contain;
+        border-radius: 4px;
+        border: 1px solid #eee;
+        padding: 4px;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .img-label-small {
+        font-size: 0.62rem;
+        color: #aaa;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .img-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 18px;
+    }
+
+    .img-upload-box {
+        background: #fafafa;
+        border: 1px dashed #ddd;
+        border-radius: 4px;
+        padding: 16px;
+    }
+
+    .img-upload-box label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #666;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .logout-link {
+        font-size: 0.68rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #c9879a;
+        text-decoration: none;
+    }
+
+    .logout-link:hover { color: #a06070; }
+
+    .alert-success {
+        background: #f0faf4;
+        border: 1px solid #b6e2c5;
+        color: #2a7a4b;
+        font-size: 0.78rem;
+        letter-spacing: 0.5px;
+        border-radius: 4px;
+        padding: 12px 18px;
+        margin-bottom: 24px;
+    }
+
+    .alert-danger {
+        background: #fff0f0;
+        border: 1px solid #f5b7b7;
+        color: #c0392b;
+        font-size: 0.78rem;
+        border-radius: 4px;
+        padding: 12px 18px;
+        margin-bottom: 24px;
+    }
+</style>
+
+<div class="admin-wrap">
+    <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+            <h1 class="admin-title">PANEL ADMIN</h1>
+            <p class="admin-subtitle">Gestión del sitio · {{ global_config.titulo_sitio if global_config else 'KAROL G' }}</p>
+        </div>
+        <a href="{{ url_for('logout') }}" class="logout-link mt-3"><i class="bi bi-box-arrow-right me-1"></i>Salir</a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('actualizar_configuracion_global') }}" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <!-- ── NAVBAR ── -->
+        <div class="admin-card">
+            <h5>Navbar</h5>
+            <div class="row g-3">
+                <div class="col-sm-6">
+                    <label class="form-label">Nombre del sitio</label>
+                    <input type="text" name="titulo_sitio" class="form-control"
+                           value="{{ global_config.titulo_sitio if global_config else 'KAROL G' }}">
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Link Music</label>
+                    <input type="text" name="sec_music" class="form-control"
+                           value="{{ global_config.sec_music if global_config else 'MUSIC' }}">
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Link Tour</label>
+                    <input type="text" name="sec_tour" class="form-control"
+                           value="{{ global_config.sec_tour if global_config else 'TOUR' }}">
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Link Merch</label>
+                    <input type="text" name="sec_merch" class="form-control"
+                           value="{{ global_config.sec_merch if global_config else 'MERCH' }}">
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Link Video</label>
+                    <input type="text" name="sec_video" class="form-control"
+                           value="{{ global_config.sec_video if global_config else 'VIDEO' }}">
+                </div>
+            </div>
+        </div>
+
+        <!-- ── REDES ── -->
+        <div class="admin-card">
+            <h5>Redes Sociales</h5>
+            <div class="row g-3">
+                <div class="col-sm-4">
+                    <label class="form-label">Instagram URL</label>
+                    <input type="url" name="link_instagram" class="form-control"
+                           value="{{ global_config.link_instagram if global_config else '' }}" placeholder="https://instagram.com/...">
+                </div>
+                <div class="col-sm-4">
+                    <label class="form-label">TikTok URL</label>
+                    <input type="url" name="link_tiktok" class="form-control"
+                           value="{{ global_config.link_tiktok if global_config else '' }}" placeholder="https://tiktok.com/@...">
+                </div>
+                <div class="col-sm-4">
+                    <label class="form-label">WhatsApp URL</label>
+                    <input type="url" name="link_whatsapp" class="form-control"
+                           value="{{ global_config.link_whatsapp if global_config else '' }}" placeholder="https://wa.me/...">
+                </div>
+            </div>
+        </div>
+
+        <!-- ── HERO ── -->
+        <div class="admin-card">
+            <h5>Sección 1 · Hero Principal</h5>
+            <div class="img-grid">
+                <div class="img-upload-box">
+                    <label>Fondo general de pantalla</label>
+                    {% if global_config and global_config.imagen_fondo %}
+                        <img src="{{ global_config.imagen_fondo }}" class="current-img" alt="Fondo actual">
+                    {% endif %}
+                    <input type="file" name="imagen_fondo" class="form-control" accept="image/*">
+                    <p class="img-label-small mt-1">Imagen de fondo de todo el hero</p>
+                </div>
+                <div class="img-upload-box">
+                    <label>Imagen título (PNG sin fondo)</label>
+                    {% if global_config and global_config.imagen_titulo %}
+                        <img src="{{ global_config.imagen_titulo }}" class="current-img" alt="Título actual">
+                    {% endif %}
+                    <input type="file" name="imagen_titulo" class="form-control" accept="image/*">
+                    <p class="img-label-small mt-1">Ej: "BICHOTA" en PNG transparente</p>
+                </div>
+                <div class="img-upload-box">
+                    <label>Imagen artista (PNG sin fondo)</label>
+                    {% if global_config and global_config.imagen_artista %}
+                        <img src="{{ global_config.imagen_artista }}" class="current-img" alt="Artista actual">
+                    {% endif %}
+                    <input type="file" name="imagen_artista" class="form-control" accept="image/*">
+                    <p class="img-label-small mt-1">Ej: Karol G con el tiburón, PNG</p>
+                </div>
+                <div class="img-upload-box">
+                    <label>Imagen artista 2 (alternante)</label>
+                    {% if global_config and global_config.imagen_artista_2 %}
+                        <img src="{{ global_config.imagen_artista_2 }}" class="current-img" alt="Artista 2 actual">
+                    {% endif %}
+                    <input type="file" name="imagen_artista_2" class="form-control" accept="image/*">
+                    <p class="img-label-small mt-1">Se alterna con la imagen 1 cada 0.5 s</p>
+                </div>
+                <div class="img-upload-box">
+                    <label>Imagen artista 3 (alternante)</label>
+                    {% if global_config and global_config.imagen_artista_3 %}
+                        <img src="{{ global_config.imagen_artista_3 }}" class="current-img" alt="Artista 3 actual">
+                    {% endif %}
+                    <input type="file" name="imagen_artista_3" class="form-control" accept="image/*">
+                    <p class="img-label-small mt-1">Tercera imagen del ciclo de 3</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── LATEST RELEASE ── -->
+        <div class="admin-card">
+            <h5>Sección 2 · Latest Release</h5>
+            <div class="row g-3 mb-3">
+                <div class="col-sm-5">
+                    <label class="form-label">Título del release</label>
+                    <input type="text" name="titulo_release" class="form-control"
+                           value="{{ global_config.titulo_release if global_config else 'UNA NOCHE EN MEDELLÍN' }}">
+                </div>
+                <div class="col-sm-4">
+                    <label class="form-label">Subtítulo / feat.</label>
+                    <input type="text" name="subtitulo_release" class="form-control"
+                           value="{{ global_config.subtitulo_release if global_config else 'X CRIS MJ X CASTRO' }}">
+                </div>
+                <div class="col-sm-3">
+                    <label class="form-label">Link de Spotify</label>
+                    <input type="url" name="link_spotify" class="form-control"
+                           value="{{ global_config.link_spotify if global_config else '#' }}" placeholder="https://open.spotify.com/...">
+                </div>
+            </div>
+            <div class="img-upload-box" style="max-width:240px">
+                <label>Foto del cover / single</label>
+                {% if global_config and global_config.imagen_release %}
+                    <img src="{{ global_config.imagen_release }}" class="current-img" alt="Release actual">
+                {% endif %}
+                <input type="file" name="imagen_release" class="form-control" accept="image/*">
+            </div>
+        </div>
+
+        <!-- ── TOUR DATES ── -->
+        <div class="admin-card">
+            <h5>Sección 3 · Upcoming Tour Dates</h5>
+            <div class="img-upload-box" style="max-width:300px">
+                <label>Imagen de tour dates</label>
+                {% if global_config and global_config.imagen_tour %}
+                    <img src="{{ global_config.imagen_tour }}" class="current-img" alt="Tour actual">
+                {% endif %}
+                <input type="file" name="imagen_tour" class="form-control" accept="image/*">
+                <p class="img-label-small mt-1">Subí la imagen completa tipo cuaderno con las fechas</p>
+            </div>
+        </div>
+
+        <!-- ── MERCH ── -->
+        <div class="admin-card">
+            <h5>Sección 4 · Merch</h5>
+            <div class="mb-3">
+                <label class="form-label">Link tienda merch</label>
+                <input type="url" name="link_merch" class="form-control"
+                       value="{{ global_config.link_merch if global_config else '#' }}"
+                       placeholder="https://..." style="max-width:400px">
+            </div>
+            <div class="img-grid">
+                {% for i in range(1, 5) %}
+                    <div class="img-upload-box">
+                        <label>Producto {{ i }}</label>
+                        {% if global_config and global_config['imagen_merch_' ~ i] %}
+                            <img src="{{ global_config['imagen_merch_' ~ i] }}" class="current-img" alt="Merch {{ i }}">
+                        {% endif %}
+                        <input type="file" name="imagen_merch_{{ i }}" class="form-control" accept="image/*">
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ── NAVE FLOTANTE ── -->
+        <div class="admin-card">
+            <h5>Nave Flotante (zigzag)</h5>
+            <p style="font-size:0.72rem;color:#888;margin-bottom:18px;letter-spacing:0.5px;">
+                Imagen chiquita que flota por la página en zigzag circular. Se alterna entre las 3 fotos cada 0.5 s. Recomendado: PNG sin fondo, aprox. 150×150 px.
+            </p>
+            <div class="img-grid">
+                <div class="img-upload-box">
+                    <label>Nave imagen 1</label>
+                    {% if global_config and global_config.imagen_nave %}
+                        <img src="{{ global_config.imagen_nave }}" class="current-img" alt="Nave 1">
+                    {% endif %}
+                    <input type="file" name="imagen_nave" class="form-control" accept="image/*">
+                </div>
+                <div class="img-upload-box">
+                    <label>Nave imagen 2</label>
+                    {% if global_config and global_config.imagen_nave_2 %}
+                        <img src="{{ global_config.imagen_nave_2 }}" class="current-img" alt="Nave 2">
+                    {% endif %}
+                    <input type="file" name="imagen_nave_2" class="form-control" accept="image/*">
+                </div>
+                <div class="img-upload-box">
+                    <label>Nave imagen 3</label>
+                    {% if global_config and global_config.imagen_nave_3 %}
+                        <img src="{{ global_config.imagen_nave_3 }}" class="current-img" alt="Nave 3">
+                    {% endif %}
+                    <input type="file" name="imagen_nave_3" class="form-control" accept="image/*">
+                </div>
+            </div>
+        </div>
+
+        <!-- ── NAVE PERSEGUIDORA ── -->
+        <div class="admin-card">
+            <h5>Nave Perseguidora</h5>
+            <p style="font-size:0.72rem;color:#888;margin-bottom:18px;letter-spacing:0.5px;">
+                Sigue a la nave flotante con un poco de retraso, como persiguiéndola. También alterna entre 3 imágenes. Si no subís imagen 1, no aparece.
+            </p>
+            <div class="img-grid">
+                <div class="img-upload-box">
+                    <label>Perseguidora imagen 1</label>
+                    {% if global_config and global_config.imagen_perseguidora %}
+                        <img src="{{ global_config.imagen_perseguidora }}" class="current-img" alt="Perseguidora 1">
+                    {% endif %}
+                    <input type="file" name="imagen_perseguidora" class="form-control" accept="image/*">
+                </div>
+                <div class="img-upload-box">
+                    <label>Perseguidora imagen 2</label>
+                    {% if global_config and global_config.imagen_perseguidora_2 %}
+                        <img src="{{ global_config.imagen_perseguidora_2 }}" class="current-img" alt="Perseguidora 2">
+                    {% endif %}
+                    <input type="file" name="imagen_perseguidora_2" class="form-control" accept="image/*">
+                </div>
+                <div class="img-upload-box">
+                    <label>Perseguidora imagen 3</label>
+                    {% if global_config and global_config.imagen_perseguidora_3 %}
+                        <img src="{{ global_config.imagen_perseguidora_3 }}" class="current-img" alt="Perseguidora 3">
+                    {% endif %}
+                    <input type="file" name="imagen_perseguidora_3" class="form-control" accept="image/*">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-save">Guardar todos los cambios</button>
+    </form>
+</div>
+
+{% endblock %}

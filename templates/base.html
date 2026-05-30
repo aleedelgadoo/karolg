@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ global_config.titulo_sitio if global_config else 'KAROL G' }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink: #e8b4c0;
+            --dark-pink: #c9879a;
+            --off-white: #fdf6f0;
+            --charcoal: #1a1a1a;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--off-white);
+            color: var(--charcoal);
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        /* ── NAVBAR ── */
+        .site-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 40px;
+            background: transparent;
+        }
+
+        .nav-brand {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.6rem;
+            color: #1a1010;
+            text-decoration: none;
+            letter-spacing: 3px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #1a1010;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #8a3050;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--charcoal);
+            color: #fff;
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        footer .brand {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+        }
+
+        .social-icon-btn {
+            color: #fff;
+            font-size: 1.3rem;
+            transition: color 0.2s;
+            text-decoration: none;
+        }
+        .social-icon-btn:hover { color: var(--pink); }
+
+        footer small { color: #888; }
+        footer .admin-link { color: #555; font-size: 0.7rem; letter-spacing: 1px; text-decoration: none; }
+        footer .admin-link:hover { color: var(--pink); }
+    </style>
+</head>
+<body>
+
+<nav class="site-nav" id="siteNav">
+    <a class="nav-brand" href="{{ url_for('inicio') }}">
+        {{ global_config.titulo_sitio if global_config else 'KAROL G' }}
+    </a>
+    <ul class="nav-links">
+        <li><a href="#music">{{ global_config.sec_music if global_config else 'MUSIC' }}</a></li>
+        <li><a href="#tour">{{ global_config.sec_tour if global_config else 'TOUR' }}</a></li>
+        <li><a href="#merch">{{ global_config.sec_merch if global_config else 'MERCH' }}</a></li>
+        <li><a href="#video">{{ global_config.sec_video if global_config else 'VIDEO' }}</a></li>
+    </ul>
+</nav>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer>
+    <div class="brand">{{ global_config.titulo_sitio if global_config else 'KAROL G' }}</div>
+    <div class="d-flex justify-content-center gap-4 mb-4">
+        <a href="{{ global_config.link_instagram if global_config else '#' }}" target="_blank" class="social-icon-btn"><i class="bi bi-instagram"></i></a>
+        <a href="{{ global_config.link_tiktok if global_config else '#' }}" target="_blank" class="social-icon-btn"><i class="bi bi-tiktok"></i></a>
+        <a href="{{ global_config.link_whatsapp if global_config else '#' }}" target="_blank" class="social-icon-btn"><i class="bi bi-whatsapp"></i></a>
+    </div>
+    <small class="d-block mb-3">&copy; 2026 {{ global_config.titulo_sitio if global_config else 'KAROL G' }}. Todos los derechos reservados.</small>
+    <a href="{{ url_for('admin_dashboard') }}" class="admin-link"><i class="bi bi-gear me-1"></i>Admin</a>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
