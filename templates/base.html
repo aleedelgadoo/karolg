@@ -1,910 +1,132 @@
-{% extends 'base.html' %}
-{% block content %}
-
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Permanent+Marker&family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
-
-<style>
-    /* ══════════════════════════════════
-       FONDO GLOBAL — se extiende a toda la página
-    ══════════════════════════════════ */
-    .page-wrapper {
-        position: relative;
-        min-height: 100vh;
-    }
-
-    .page-bg {
-        position: fixed;
-        inset: 0;
-        z-index: -1;
-        {% if global_config and global_config.imagen_fondo %}
-        background-image: url('{{ global_config.imagen_fondo }}');
-        background-size: cover;
-        background-position: center top;
-        background-attachment: fixed;
-        {% else %}
-        background: linear-gradient(180deg,
-            #f5c0ce 0%,
-            #f0aabf 20%,
-            #eca8be 40%,
-            #f2bac8 60%,
-            #f5c8d4 80%,
-            #f8d4de 100%);
-        {% endif %}
-        transition: opacity 0.8s ease;
-    }
-
-    .page-bg-2 {
-        position: fixed;
-        inset: 0;
-        z-index: -2;
-        {% if global_config and global_config.imagen_fondo_2 %}
-        background-image: url('{{ global_config.imagen_fondo_2 }}');
-        background-size: cover;
-        background-position: center top;
-        background-attachment: fixed;
-        {% else %}
-        background: linear-gradient(180deg,
-            #c8a8d8 0%,
-            #b894cc 20%,
-            #a880c0 40%,
-            #b894cc 60%,
-            #c8a8d8 80%,
-            #d4b8e0 100%);
-        {% endif %}
-    }
-
-    /* Textura de papel/lienzo sobre el fondo */
-    .page-bg::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background-image:
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
-        pointer-events: none;
-    }
-
-    /* ── TIPOGRAFÍA MANUSCRITA/LÁPIZ ── */
-    .font-sketch {
-        font-family: 'Kalam', cursive;
-        font-weight: 700;
-    }
-
-    .font-marker {
-        font-family: 'Permanent Marker', cursive;
-    }
-
-    .font-handwrite {
-        font-family: 'Caveat', cursive;
-    }
-
-    /* ── HERO ── */
-    .hero-section {
-        position: relative;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-end;
-        overflow: visible;
-        padding-bottom: 40px;
-    }
-
-    .hero-titulo-img {
-        max-width: 620px;
-        width: 88%;
-        filter: drop-shadow(0 2px 12px rgba(0,0,0,0.15));
-        position: relative;
-        z-index: 3;
-        display: block;
-        margin-bottom: -20px;
-    }
-
-    /* Wrapper del flash de 2 imágenes */
-    #heroFlashWrap {
-        position: relative;
-        width: 92%;
-        max-width: 700px;
-        z-index: 2;
-    }
-
-    #heroFlashWrap img {
-        display: block;
-        width: 100%;
-        filter: drop-shadow(0 8px 32px rgba(0,0,0,0.18));
-    }
-
-    #heroFlashWrap #heroImg2 {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        object-fit: contain;
-    }
-
-    /* Imagen solitaria (sin flash) */
-    .hero-artista-img {
-        max-width: 700px;
-        width: 92%;
-        display: block;
-        margin: 0 auto;
-        filter: drop-shadow(0 8px 32px rgba(0,0,0,0.18));
-        position: relative;
-        z-index: 2;
-    }
-
-    /* Deco sketch SVG */
-    .sketch-deco {
-        position: absolute;
-        z-index: 1;
-        pointer-events: none;
-    }
-
-    /* ── LATEST RELEASE ── */
-    #music {
-        position: relative;
-        padding: 90px 20px 80px;
-    }
-
-    .release-label {
-        font-family: 'Kalam', cursive;
-        font-weight: 700;
-        font-size: clamp(1.6rem, 4vw, 2.4rem);
-        color: #2a1a1f;
-        margin-bottom: 30px;
-        letter-spacing: 1px;
-    }
-
-    .release-label::after {
-        content: ':';
-    }
-
-    .release-title {
-        font-family: 'Kalam', cursive;
-        font-weight: 700;
-        font-size: clamp(1.8rem, 4.5vw, 3rem);
-        line-height: 1.1;
-        margin-bottom: 8px;
-        color: #1a1010;
-        text-shadow: 1px 1px 0 rgba(0,0,0,0.06);
-    }
-
-    .release-subtitle {
-        font-family: 'Kalam', cursive;
-        font-size: clamp(1rem, 2.5vw, 1.4rem);
-        color: #3a2028;
-        margin-bottom: 28px;
-        font-weight: 400;
-    }
-
-    .release-cover {
-        width: 100%;
-        max-width: 340px;
-        aspect-ratio: 1;
-        object-fit: cover;
-        border-radius: 3px;
-        box-shadow:
-            4px 4px 0 rgba(0,0,0,0.08),
-            0 16px 50px rgba(0,0,0,0.2);
-        border: 3px solid rgba(255,255,255,0.6);
-        transform: rotate(-1.5deg);
-    }
-
-    .release-cover-placeholder {
-        width: 100%;
-        max-width: 340px;
-        aspect-ratio: 1;
-        background: rgba(255,255,255,0.35);
-        border-radius: 3px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #8a5060;
-        font-family: 'Kalam', cursive;
-        font-size: 1rem;
-        border: 2px dashed #c9879a;
-        transform: rotate(-1.5deg);
-    }
-
-    /* Spotify bar estilo real */
-    .spotify-bar {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: rgba(30, 30, 30, 0.88);
-        backdrop-filter: blur(8px);
-        border-radius: 8px;
-        padding: 12px 16px;
-        max-width: 360px;
-        margin-top: 20px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-    }
-
-    .spotify-bar .cover-thumb {
-        width: 42px;
-        height: 42px;
-        border-radius: 4px;
-        object-fit: cover;
-        flex-shrink: 0;
-        background: #333;
-    }
-
-    .spotify-bar .cover-thumb-placeholder {
-        width: 42px;
-        height: 42px;
-        border-radius: 4px;
-        background: #444;
-        flex-shrink: 0;
-    }
-
-    .spotify-bar .song-info { flex: 1; min-width: 0; }
-    .spotify-bar .song-name {
-        font-size: 0.78rem;
-        font-weight: 600;
-        color: #fff;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .spotify-bar .song-artist { font-size: 0.65rem; color: #aaa; margin-top: 1px; }
-
-    .spotify-bar .time-row {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.6rem;
-        color: #888;
-        margin-top: 5px;
-    }
-
-    .progress-bar-bg {
-        height: 3px;
-        background: #555;
-        border-radius: 2px;
-        margin-top: 6px;
-        position: relative;
-    }
-
-    .progress-bar-fill {
-        height: 100%;
-        width: 4%;
-        background: #1DB954;
-        border-radius: 2px;
-    }
-
-    .spotify-logo {
-        flex-shrink: 0;
-    }
-
-    .btn-spotify {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: #1DB954;
-        color: #000;
-        font-family: 'Kalam', cursive;
-        font-size: 1rem;
-        font-weight: 700;
-        padding: 11px 26px;
-        border-radius: 50px;
-        text-decoration: none;
-        transition: transform 0.2s, box-shadow 0.2s;
-        box-shadow: 0 3px 14px rgba(29,185,84,0.35);
-    }
-
-    .btn-spotify:hover {
-        transform: scale(1.04);
-        box-shadow: 0 6px 22px rgba(29,185,84,0.5);
-        color: #000;
-    }
-
-    /* Separador sketch */
-    .sketch-divider {
-        width: 100%;
-        max-width: 600px;
-        margin: 0 auto;
-        opacity: 0.25;
-    }
-
-    /* ── TOUR ── */
-    #tour {
-        position: relative;
-        padding: 80px 20px 90px;
-        text-align: center;
-    }
-
-    .tour-title {
-        font-family: 'Kalam', cursive;
-        font-weight: 700;
-        font-size: clamp(2rem, 6vw, 4rem);
-        color: #1a1010;
-        margin-bottom: 40px;
-        letter-spacing: 2px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 16px;
-    }
-
-    .tour-title .star-icon {
-        font-size: 0.65em;
-        opacity: 0.7;
-    }
-
-    .tour-img {
-        max-width: 520px;
-        width: 100%;
-        display: block;
-        margin: 0 auto;
-    }
-
-    /* ── MERCH ── */
-    #merch {
-        position: relative;
-        padding: 80px 20px 100px;
-        text-align: center;
-    }
-
-    .merch-title {
-        font-family: 'Permanent Marker', cursive;
-        font-size: clamp(2.5rem, 7vw, 5rem);
-        color: #1a1010;
-        margin-bottom: 10px;
-        letter-spacing: 3px;
-    }
-
-    .merch-grid {
-        display: flex;
-        gap: 24px;
-        justify-content: center;
-        align-items: flex-end;
-        flex-wrap: wrap;
-        margin-top: 48px;
-    }
-
-    .merch-item {
-        flex: 0 0 auto;
-        width: 200px;
-        position: relative;
-    }
-
-    /* Rotaciones alternadas como en la foto */
-    .merch-item:nth-child(1) { transform: rotate(-2deg); }
-    .merch-item:nth-child(2) { transform: rotate(1deg); }
-    .merch-item:nth-child(3) { transform: rotate(-1deg); }
-    .merch-item:nth-child(4) { transform: rotate(2deg); }
-
-    .merch-item img {
-        width: 100%;
-        aspect-ratio: 1;
-        object-fit: contain;
-        border-radius: 0;
-        transition: transform 0.3s;
-        background: transparent;
-        padding: 0;
-        box-shadow: none;
-    }
-
-    .merch-item:hover img {
-        transform: scale(1.07) rotate(0deg) !important;
-        box-shadow: 4px 8px 28px rgba(0,0,0,0.2);
-    }
-
-    .merch-item:hover { transform: none !important; }
-
-    .merch-placeholder {
-        width: 100%;
-        aspect-ratio: 1;
-        background: rgba(255,255,255,0.45);
-        border: 2px dashed #c9879a;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #8a5060;
-        font-family: 'Kalam', cursive;
-        font-size: 0.85rem;
-    }
-
-    .btn-merch {
-        display: inline-block;
-        margin-top: 48px;
-        background: rgba(26,16,16,0.85);
-        color: #fff;
-        font-family: 'Kalam', cursive;
-        font-size: 1.1rem;
-        font-weight: 700;
-        letter-spacing: 1px;
-        padding: 13px 38px;
-        text-decoration: none;
-        border-radius: 4px;
-        transition: background 0.2s, transform 0.2s;
-        box-shadow: 0 4px 18px rgba(0,0,0,0.18);
-    }
-
-    .btn-merch:hover {
-        background: #333;
-        color: #fff;
-        transform: translateY(-2px);
-    }
-
-    /* Nav links también en Kalam */
-    .nav-links a {
-        font-family: 'Kalam', cursive !important;
-        font-size: 0.9rem !important;
-        font-weight: 700 !important;
-        letter-spacing: 1px !important;
-    }
-
-    .nav-brand {
-        font-family: 'Kalam', cursive !important;
-        font-size: 1.5rem !important;
-        letter-spacing: 2px !important;
-    }
-
-    /* ── NAVE ESPACIAL FLOTANTE ── */
-    #nave-flotante, #nave-perseguidora {
-        position: fixed;
-        width: 749px;
-        height: 749px;
-        z-index: 10;
-        pointer-events: none;
-        will-change: transform;
-    }
-
-    #nave-perseguidora {
-        width: 642px;
-        height: 642px;
-        z-index: 9;
-    }
-
-    #nave-flotante img, #nave-perseguidora img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        filter: drop-shadow(0 4px 12px rgba(0,0,0,0.25));
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-        .hero-titulo-img { max-width: 300px; }
-        .hero-artista-img { max-width: 100%; }
-        .release-cover, .release-cover-placeholder { max-width: 240px; }
-        .merch-item { width: 150px; }
-        .spotify-bar { max-width: 100%; }
-        .side-png { display: none; }
-    }
-
-    /* ── SECCIONES SOLO PNG ── */
-    .png-only-section {
-        position: relative;
-        padding: 60px 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 300px;
-    }
-
-    .png-only-section img {
-        max-width: 700px;
-        width: 90%;
-        display: block;
-        filter: drop-shadow(0 8px 32px rgba(0,0,0,0.12));
-    }
-
-    .png-only-placeholder {
-        max-width: 500px;
-        width: 90%;
-        height: 200px;
-        background: rgba(255,255,255,0.25);
-        border: 2px dashed #c9879a;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Kalam', cursive;
-        color: #8a5060;
-        font-size: 0.9rem;
-    }
-
-    /* ── IMÁGENES LATERALES FLOTANTES ── */
-    .side-png {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: clamp(200px, 22vw, 380px);
-        pointer-events: none;
-        z-index: 2;
-    }
-
-    .side-png img {
-        width: 100%;
-        filter: drop-shadow(0 8px 32px rgba(0,0,0,0.18));
-    }
-
-    .side-png-left  { left: -2vw; }
-    .side-png-right { right: -2vw; }
-
-    /* Sections con relative para anclar side-png */
-    #tour, #merch, #music { position: relative; overflow: visible; }
-</style>
-
-<div class="page-wrapper">
-    <div class="page-bg" id="pageBg1"></div>
-    <div class="page-bg-2"></div>
-
-    <!-- ════════════════════════════════
-         SECCIÓN 1: HERO
-    ════════════════════════════════ -->
-    <section class="hero-section" id="hero">
-
-        <!-- Decoraciones sketch tipo lápiz -->
-        <svg class="sketch-deco" style="top:10%; left:4%; width:55px; opacity:0.5" viewBox="0 0 60 60">
-            <path d="M30 4 L36 22 L56 22 L41 34 L47 52 L30 40 L13 52 L19 34 L4 22 L24 22 Z"
-                  fill="none" stroke="#2a1a1f" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <svg class="sketch-deco" style="top:8%; left:18%; width:34px; opacity:0.35" viewBox="0 0 40 40">
-            <polygon points="20,2 23,13 36,13 26,21 30,33 20,26 10,33 14,21 4,13 17,13"
-                     fill="none" stroke="#2a1a1f" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-        <svg class="sketch-deco" style="top:22%; right:6%; width:48px; opacity:0.45" viewBox="0 0 60 60">
-            <path d="M30 4 L36 22 L56 22 L41 34 L47 52 L30 40 L13 52 L19 34 L4 22 L24 22 Z"
-                  fill="none" stroke="#2a1a1f" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <!-- Diamante -->
-        <svg class="sketch-deco" style="top:38%; left:7%; width:40px; opacity:0.4" viewBox="0 0 50 60">
-            <polygon points="25,2 48,20 25,58 2,20" fill="none" stroke="#2a1a1f" stroke-width="2" stroke-linecap="round"/>
-            <line x1="2" y1="20" x2="48" y2="20" stroke="#2a1a1f" stroke-width="1.5"/>
-            <line x1="25" y1="2" x2="2" y2="20" stroke="#2a1a1f" stroke-width="1"/>
-            <line x1="25" y1="2" x2="48" y2="20" stroke="#2a1a1f" stroke-width="1"/>
-        </svg>
-        <svg class="sketch-deco" style="top:15%; right:22%; width:30px; opacity:0.35" viewBox="0 0 50 60">
-            <polygon points="25,2 48,20 25,58 2,20" fill="none" stroke="#2a1a1f" stroke-width="2" stroke-linecap="round"/>
-            <line x1="2" y1="20" x2="48" y2="20" stroke="#2a1a1f" stroke-width="1.5"/>
-        </svg>
-        <!-- Notas musicales -->
-        <svg class="sketch-deco" style="top:50%; right:5%; width:44px; opacity:0.45" viewBox="0 0 60 60">
-            <path d="M20 10 L20 40 Q20 48 13 48 Q6 48 6 42 Q6 36 13 36 Q17 36 20 38 L20 18 L46 12 L46 36 Q46 44 39 44 Q32 44 32 38 Q32 32 39 32 Q43 32 46 34 L46 12 Z"
-                  fill="none" stroke="#2a1a1f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <svg class="sketch-deco" style="top:60%; left:5%; width:28px; opacity:0.35" viewBox="0 0 40 50">
-            <path d="M12 8 L12 36 Q12 43 6 43 Q1 43 1 38 Q1 33 6 33 Q10 33 12 35 L12 15 L32 9 L32 32 Q32 39 26 39 Q21 39 21 34 Q21 29 26 29 Q30 29 32 31 L32 9 Z"
-                  fill="none" stroke="#2a1a1f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <!-- Estrella pequeña -->
-        <svg class="sketch-deco" style="top:30%; right:14%; width:22px; opacity:0.4" viewBox="0 0 30 30">
-            <path d="M15 2 L17 11 L26 11 L19 17 L22 26 L15 20 L8 26 L11 17 L4 11 L13 11 Z"
-                  fill="none" stroke="#2a1a1f" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-        <!-- Cruz/brillo tipo sticker -->
-        <svg class="sketch-deco" style="top:72%; right:10%; width:26px; opacity:0.4" viewBox="0 0 30 30">
-            <line x1="15" y1="1" x2="15" y2="29" stroke="#2a1a1f" stroke-width="2" stroke-linecap="round"/>
-            <line x1="1" y1="15" x2="29" y2="15" stroke="#2a1a1f" stroke-width="2" stroke-linecap="round"/>
-            <line x1="5" y1="5" x2="25" y2="25" stroke="#2a1a1f" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
-            <line x1="25" y1="5" x2="5" y2="25" stroke="#2a1a1f" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
-        </svg>
-
-        <div style="position:relative; z-index:2; width:100%; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; min-height:100vh; padding-bottom:40px;">
-            {% if global_config and global_config.imagen_titulo %}
-                <img src="{{ global_config.imagen_titulo }}" alt="Título" class="hero-titulo-img">
-            {% endif %}
-
-            {% if global_config and global_config.imagen_artista %}
-                {% if global_config.imagen_artista_2 %}
-                    <div id="heroFlashWrap">
-                        <img src="{{ global_config.imagen_artista }}"   alt="Artista"   id="heroImg1">
-                        <img src="{{ global_config.imagen_artista_2 }}" alt="Artista 2" id="heroImg2" style="opacity:0;">
-                    </div>
-                    <script>
-                    (function() {
-                        var img1 = document.getElementById('heroImg1');
-                        var img2 = document.getElementById('heroImg2');
-                        var show1 = true;
-                        setInterval(function() {
-                            show1 = !show1;
-                            img1.style.opacity = show1 ? '1' : '0';
-                            img2.style.opacity = show1 ? '0' : '1';
-                        }, 500);
-                    })();
-                    </script>
-                {% else %}
-                    <img src="{{ global_config.imagen_artista }}" alt="Artista" class="hero-artista-img">
-                {% endif %}
-            {% endif %}
-
-            {% if not (global_config and global_config.imagen_artista) and not (global_config and global_config.imagen_titulo) %}
-                <h1 class="font-marker" style="font-size:clamp(4rem,13vw,10rem);color:#1a1010;letter-spacing:4px;text-shadow:2px 2px 0 rgba(0,0,0,0.1);margin:0;">BICHOTA</h1>
-            {% endif %}
-        </div>
-    </section>
-
-    <!-- ════════════════════════════════
-         SECCIÓN 2: LATEST RELEASE
-    ════════════════════════════════ -->
-    <section id="music">
-        <!-- Imagen lateral derecha de Latest Release -->
-        {% if global_config and global_config.imagen_lateral_music %}
-        <div class="side-png side-png-right">
-            <img src="{{ global_config.imagen_lateral_music }}" alt="Deco music">
-        </div>
-        {% endif %}
-        <div class="container">
-            <div class="row align-items-center justify-content-center g-5">
-                <div class="col-md-5 text-center text-md-start order-md-2">
-                    {% if global_config and global_config.imagen_release %}
-                        <img src="{{ global_config.imagen_release }}" alt="Release" class="release-cover mx-auto mx-md-0 d-block">
-                    {% else %}
-                        <div class="release-cover-placeholder mx-auto mx-md-0">cover</div>
-                    {% endif %}
-                </div>
-                <div class="col-md-5 text-center text-md-start order-md-1">
-                    <p class="release-label">Best Release</p>
-                    <h2 class="release-title">{{ global_config.titulo_release if global_config else 'UNA NOCHE EN MEDELLÍN' }}</h2>
-                    <p class="release-subtitle">{{ global_config.subtitulo_release if global_config else 'X CRIS MJ X CASTRO' }}</p>
-
-                    <div class="spotify-bar">
-                        {% if global_config and global_config.imagen_release %}
-                            <img src="{{ global_config.imagen_release }}" class="cover-thumb" alt="cover">
-                        {% else %}
-                            <div class="cover-thumb-placeholder"></div>
-                        {% endif %}
-                        <div class="song-info">
-                            <div class="song-name">{{ global_config.titulo_release if global_config else 'Una Noche En Medellín' }}</div>
-                            <div class="song-artist">Karol G</div>
-                            <div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
-                            <div class="time-row"><span>0:07</span><span>-3:32</span></div>
-                        </div>
-                        <a href="{{ global_config.link_spotify if global_config else '#' }}" target="_blank" class="spotify-logo">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#1DB954"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.623.623 0 01-.857.207c-2.348-1.435-5.304-1.76-8.785-.964a.623.623 0 11-.277-1.215c3.809-.87 7.076-.496 9.712 1.115a.623.623 0 01.207.857zm1.223-2.722a.78.78 0 01-1.072.257c-2.687-1.652-6.785-2.131-9.965-1.166a.78.78 0 01-.973-.517.781.781 0 01.517-.973c3.632-1.102 8.147-.569 11.236 1.327a.78.78 0 01.257 1.072zm.105-2.835C14.692 8.95 9.375 8.775 6.297 9.71a.937.937 0 11-.543-1.793c3.563-1.08 9.484-.87 13.22 1.37a.937.937 0 01-.06 1.58z"/></svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ════════════════════════════════
-         SECCIÓN PNG 1: entre Music y Tour
-    ════════════════════════════════ -->
-    {% if global_config and global_config.imagen_png_sec1 %}
-    <section class="png-only-section">
-        <img src="{{ global_config.imagen_png_sec1 }}" alt="Sección decorativa 1">
-    </section>
-    {% endif %}
-
-    <!-- ════════════════════════════════
-         SECCIÓN 3: TOUR DATES
-    ════════════════════════════════ -->
-    <section id="tour">
-        <!-- Imagen lateral izquierda de Tour Dates -->
-        {% if global_config and global_config.imagen_lateral_tour %}
-        <div class="side-png side-png-left">
-            <img src="{{ global_config.imagen_lateral_tour }}" alt="Deco tour">
-        </div>
-        {% endif %}
-        <div class="container text-center">
-            <h2 class="tour-title">
-                <span class="star-icon">✦</span>
-                Tour Dates
-                <span class="star-icon">✦</span>
-            </h2>
-            {% if global_config and global_config.imagen_tour %}
-                <img src="{{ global_config.imagen_tour }}" alt="Tour Dates" class="tour-img">
-            {% else %}
-                <div style="max-width:520px;margin:0 auto;background:rgba(255,255,255,0.35);border-radius:4px;padding:60px 40px;border:2px dashed #c9879a;">
-                    <span style="font-family:'Kalam',cursive;font-size:1rem;color:#8a5060;">Subir imagen de tour dates desde el admin</span>
-                </div>
-            {% endif %}
-        </div>
-    </section>
-
-    <!-- ════════════════════════════════
-         SECCIÓN PNG 2: entre Tour y Merch
-    ════════════════════════════════ -->
-    {% if global_config and global_config.imagen_png_sec2 %}
-    <section class="png-only-section">
-        <img src="{{ global_config.imagen_png_sec2 }}" alt="Sección decorativa 2">
-    </section>
-    {% endif %}
-
-    <!-- ════════════════════════════════
-         SECCIÓN 4: MERCH
-    ════════════════════════════════ -->
-    <section id="merch">
-        <!-- Imagen lateral derecha de Merch -->
-        {% if global_config and global_config.imagen_lateral_merch %}
-        <div class="side-png side-png-right">
-            <img src="{{ global_config.imagen_lateral_merch }}" alt="Deco merch">
-        </div>
-        {% endif %}
-        <div class="container">
-            <h2 class="merch-title">MERCH</h2>
-            <div class="merch-grid">
-                {% for i in range(1, 5) %}
-                    <div class="merch-item">
-                        {% if global_config and global_config['imagen_merch_' ~ i] %}
-                            <img src="{{ global_config['imagen_merch_' ~ i] }}" alt="Merch {{ i }}">
-                        {% else %}
-                            <div class="merch-placeholder">producto {{ i }}</div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-            {% if global_config and global_config.link_merch and global_config.link_merch != '#' %}
-                <div class="text-center">
-                    <a href="{{ global_config.link_merch }}" target="_blank" class="btn-merch">Ver todo el merch →</a>
-                </div>
-            {% endif %}
-        </div>
-    </section>
-
-    <!-- ════════════════════════════════
-         SECCIÓN PNG 3: después de Merch
-    ════════════════════════════════ -->
-    {% if global_config and global_config.imagen_png_sec3 %}
-    <section class="png-only-section">
-        <img src="{{ global_config.imagen_png_sec3 }}" alt="Sección decorativa 3">
-    </section>
-    {% endif %}
-
-<!-- ── TEXTO MANUSCRITO FONDO ── -->
-<div style="
-    position: fixed;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-family: 'Caveat', cursive;
-    font-size: clamp(2.2rem, 4vw, 3.2rem);
-    color: rgba(42, 26, 31, 0.7);
-    white-space: nowrap;
-    pointer-events: none;
-    z-index: 1;
-    letter-spacing: 3px;
-    user-select: none;
-">Más dura que nunca</div>
-
-{% if global_config and global_config.imagen_nave %}
-<!-- ── NAVE FLOTANTE + PERSEGUIDORA ── -->
-<div id="nave-flotante">
-    <img src="{{ global_config.imagen_nave }}" alt="nave" id="naveImg">
-</div>
-
-{% if global_config.imagen_perseguidora %}
-<div id="nave-perseguidora">
-    <img src="{{ global_config.imagen_perseguidora }}" alt="perseguidora" id="perseguidoraImg">
-</div>
-{% endif %}
-
-<script>
-(function() {
-    var nave = document.getElementById('nave-flotante');
-    if (!nave) return;
-
-    // --- Alternancia de 3 imágenes NAVE ---
-    var srcsNave = [
-        "{{ global_config.imagen_nave }}",
-        "{{ global_config.imagen_nave_2 or global_config.imagen_nave }}",
-        "{{ global_config.imagen_nave_3 or global_config.imagen_nave }}"
-    ];
-    var imgNave = document.getElementById('naveImg');
-    var idxNave = 0;
-    setInterval(function() {
-        idxNave = (idxNave + 1) % srcsNave.length;
-        imgNave.src = srcsNave[idxNave];
-    }, 500);
-
-    // --- Alternancia de 3 imágenes PERSEGUIDORA ---
-    var persEl = document.getElementById('nave-perseguidora');
-    var imgPers = document.getElementById('perseguidoraImg');
-    if (persEl && imgPers) {
-        var srcsPers = [
-            "{{ global_config.imagen_perseguidora or '' }}",
-            "{{ global_config.imagen_perseguidora_2 or global_config.imagen_perseguidora or '' }}",
-            "{{ global_config.imagen_perseguidora_3 or global_config.imagen_perseguidora or '' }}"
-        ];
-        var idxPers = 0;
-        setInterval(function() {
-            idxPers = (idxPers + 1) % srcsPers.length;
-            imgPers.src = srcsPers[idxPers];
-        }, 500);
-    }
-
-    // --- Trayectoria compartida ---
-    var t = 0;
-    var lastScroll = window.scrollY;
-    var amplX = 700, amplY = 200, freqX = 1.8, freqY = 1.0;
-
-    window.addEventListener('scroll', function() {
-        var delta = window.scrollY - lastScroll;
-        lastScroll = window.scrollY;
-        t += delta * 0.002;
-    }, { passive: true });
-
-    function lerp(a, b, k) { return a + (b - a) * k; }
-
-    // Posición actual NAVE (suavizada)
-    var naveX = window.innerWidth * 0.5;
-    var naveY = window.innerHeight * 0.6;
-
-    // Historial de posiciones para el perseguidor (cola circular)
-    var DELAY_FRAMES = 40;
-    var posHistory = [];
-    for (var i = 0; i < DELAY_FRAMES; i++) {
-        posHistory.push({ x: naveX, y: naveY });
-    }
-    var histIdx = 0;
-
-    // Posición actual PERSEGUIDORA (suavizada)
-    var persX = naveX, persY = naveY - 450;
-
-    // Tiempo real para la trayectoria — avanza con Date.now(), nunca se dispara
-    var startTime = Date.now();
-
-    function animate() {
-        // phase basado en tiempo real (segundos) + scroll, acotado y estable
-        var elapsed = (Date.now() - startTime) / 1000; // segundos reales
-        var phase = elapsed * 0.09 + t;               // 0.18 rad/s = lento y constante
-
-        var cx = window.innerWidth  * 0.5;
-        var cy = window.innerHeight * 0.75;
-
-        var targetX = cx + Math.sin(phase * freqX) * amplX;
-        var targetY = cy + Math.sin(phase * freqY + Math.PI * 0.4) * amplY;
-
-        naveX = lerp(naveX, targetX, 0.03);
-        naveY = lerp(naveY, targetY, 0.03);
-
-        // Guardar en historial circular
-        posHistory[histIdx] = { x: naveX, y: naveY };
-        histIdx = (histIdx + 1) % DELAY_FRAMES;
-        var oldPos = posHistory[histIdx];
-
-        // Clamp nave dentro de pantalla (mitad del elemento = 375)
-        var naveHalf = 375;
-        var clampedNaveX = Math.max(naveHalf, Math.min(window.innerWidth  - naveHalf, naveX));
-        var clampedNaveY = Math.max(naveHalf, Math.min(window.innerHeight - naveHalf, naveY));
-        nave.style.left = (clampedNaveX - naveHalf) + 'px';
-        nave.style.top  = (clampedNaveY - naveHalf) + 'px';
-
-        if (persEl && oldPos) {
-            persX = lerp(persX, oldPos.x, 0.04);
-            // Perseguidora siempre 180px arriba de la nave, suavizado
-            var persTargetY = naveY - 700;
-            persY = lerp(persY, persTargetY, 0.025);
-
-            // Clamp perseguidora dentro de pantalla (mitad del elemento = 321)
-            var persHalf = 321;
-            var clampedPersX = Math.max(persHalf, Math.min(window.innerWidth  - persHalf, persX));
-            var clampedPersY = Math.max(persHalf, Math.min(window.innerHeight - persHalf, persY));
-            persEl.style.left = (clampedPersX - persHalf) + 'px';
-            persEl.style.top  = (clampedPersY - persHalf) + 'px';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ global_config.titulo_sitio if global_config else 'KAROL G' }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink: #e8b4c0;
+            --dark-pink: #c9879a;
+            --off-white: #fdf6f0;
+            --charcoal: #1a1a1a;
         }
 
-        requestAnimationFrame(animate);
-    }
+        * { box-sizing: border-box; }
 
-    animate();
-})();
-</script>
-{% endif %}
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--off-white);
+            color: var(--charcoal);
+            overflow-x: hidden;
+            margin: 0;
+        }
 
-</div><!-- /page-wrapper -->
+        /* ── NAVBAR ── */
+        .site-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 26px 56px;
+            background: transparent;
+        }
 
-<script>
-// ── FONDO DUAL: fade al 50% del scroll ──
-(function() {
-    var bg1 = document.getElementById('pageBg1');
-    if (!bg1) return;
-    function updateBgFade() {
-        var scrolled = window.scrollY;
-        var total = document.body.scrollHeight - window.innerHeight;
-        if (total <= 0) return;
-        var pct = scrolled / total; // 0 a 1
-        // A partir del 50% (0.5) empieza a desvanecerse, completo a 70%
-        var opacity = 1 - Math.max(0, Math.min(1, (pct - 0.45) / 0.25));
-        bg1.style.opacity = opacity;
-    }
-    window.addEventListener('scroll', updateBgFade, { passive: true });
-    updateBgFade();
-})();
-</script>
+        .nav-brand {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.1rem;
+            color: #1a1010;
+            text-decoration: none;
+            letter-spacing: 3px;
+        }
 
-{% endblock %}
+        .nav-links {
+            display: flex;
+            gap: 44px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #1a1010;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #8a3050;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--charcoal);
+            color: #fff;
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        footer .brand {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+        }
+
+        .social-icon-btn {
+            color: #fff;
+            font-size: 1.3rem;
+            transition: color 0.2s;
+            text-decoration: none;
+        }
+        .social-icon-btn:hover { color: var(--pink); }
+
+        footer small { color: #888; }
+        footer .admin-link { color: #555; font-size: 0.7rem; letter-spacing: 1px; text-decoration: none; }
+        footer .admin-link:hover { color: var(--pink); }
+    </style>
+</head>
+<body>
+
+<nav class="site-nav" id="siteNav">
+    <a class="nav-brand" href="{{ url_for('inicio') }}">
+        {{ global_config.titulo_sitio if global_config else 'KAROL G' }}
+    </a>
+    <ul class="nav-links">
+        <li><a href="#music">{{ global_config.sec_music if global_config else 'MUSIC' }}</a></li>
+        <li><a href="#tour">{{ global_config.sec_tour if global_config else 'TOUR' }}</a></li>
+        <li><a href="#merch">{{ global_config.sec_merch if global_config else 'MERCH' }}</a></li>
+        <li><a href="#video">{{ global_config.sec_video if global_config else 'VIDEO' }}</a></li>
+    </ul>
+</nav>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer>
+    <div class="brand">{{ global_config.titulo_sitio if global_config else 'KAROL G' }}</div>
+    <div class="d-flex justify-content-center gap-4 mb-4">
+        <a href="{{ global_config.link_instagram if global_config else '#' }}" target="_blank" class="social-icon-btn"><i class="bi bi-instagram"></i></a>
+        <a href="{{ global_config.link_tiktok if global_config else '#' }}" target="_blank" class="social-icon-btn"><i class="bi bi-tiktok"></i></a>
+        <a href="{{ global_config.link_whatsapp if global_config else '#' }}" target="_blank" class="social-icon-btn"><i class="bi bi-whatsapp"></i></a>
+    </div>
+    <small class="d-block mb-3">&copy; 2026 {{ global_config.titulo_sitio if global_config else 'KAROL G' }}. Todos los derechos reservados.</small>
+    <a href="{{ url_for('admin_dashboard') }}" class="admin-link"><i class="bi bi-gear me-1"></i>Admin</a>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
