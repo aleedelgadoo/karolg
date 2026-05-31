@@ -443,16 +443,16 @@
     /* ── NAVE ESPACIAL FLOTANTE ── */
     #nave-flotante, #nave-perseguidora {
         position: fixed;
-        width: 233px;
-        height: 233px;
+        width: 1400px;
+        height: 1400px;
         z-index: 10;
         pointer-events: none;
         will-change: transform;
     }
 
     #nave-perseguidora {
-        width: 200px;
-        height: 200px;
+        width: 1200px;
+        height: 1200px;
         z-index: 9;
     }
 
@@ -470,9 +470,7 @@
         .release-cover, .release-cover-placeholder { max-width: 240px; }
         .merch-item { width: 150px; }
         .spotify-bar { max-width: 100%; }
-        .side-png { width: clamp(80px, 22vw, 130px); }
-        .side-png-left  { left: -3vw; }
-        .side-png-right { right: -3vw; }
+        .side-png { display: none; }
     }
 
     /* ── SECCIONES SOLO PNG ── */
@@ -812,7 +810,7 @@
     // --- Trayectoria compartida ---
     var t = 0;
     var lastScroll = window.scrollY;
-    var freqX = 1.8, freqY = 1.0;
+    var amplX = 700, amplY = 200, freqX = 1.8, freqY = 1.0;
 
     window.addEventListener('scroll', function() {
         var delta = window.scrollY - lastScroll;
@@ -835,24 +833,18 @@
     var histIdx = 0;
 
     // Posición actual PERSEGUIDORA (suavizada)
-    var persX = naveX, persY = naveY - 150;
+    var persX = naveX, persY = naveY - 450;
 
     // Tiempo real para la trayectoria — avanza con Date.now(), nunca se dispara
     var startTime = Date.now();
 
     function animate() {
-        // Amplitudes relativas al tamaño de pantalla — funciona en móvil y desktop
-        var naveHalf = 116;
-        var persHalf = 100;
-        var amplX = (window.innerWidth  * 0.5) - naveHalf - 10;
-        var amplY = (window.innerHeight * 0.2);
-
         // phase basado en tiempo real (segundos) + scroll, acotado y estable
-        var elapsed = (Date.now() - startTime) / 1000;
-        var phase = elapsed * 0.09 + t;
+        var elapsed = (Date.now() - startTime) / 1000; // segundos reales
+        var phase = elapsed * 0.09 + t;               // 0.18 rad/s = lento y constante
 
         var cx = window.innerWidth  * 0.5;
-        var cy = window.innerHeight * 0.72;
+        var cy = window.innerHeight * 0.75;
 
         var targetX = cx + Math.sin(phase * freqX) * amplX;
         var targetY = cy + Math.sin(phase * freqY + Math.PI * 0.4) * amplY;
@@ -865,6 +857,8 @@
         histIdx = (histIdx + 1) % DELAY_FRAMES;
         var oldPos = posHistory[histIdx];
 
+        // Clamp nave dentro de pantalla (mitad del elemento = 700)
+        var naveHalf = 700;
         var clampedNaveX = Math.max(naveHalf, Math.min(window.innerWidth  - naveHalf, naveX));
         var clampedNaveY = Math.max(naveHalf, Math.min(window.innerHeight - naveHalf, naveY));
         nave.style.left = (clampedNaveX - naveHalf) + 'px';
@@ -872,11 +866,12 @@
 
         if (persEl && oldPos) {
             persX = lerp(persX, oldPos.x, 0.04);
-            // Perseguidora encima de la nave, distancia proporcional a la pantalla
-            var persOffsetY = window.innerHeight * 0.28;
-            var persTargetY = naveY - persOffsetY;
+            // Perseguidora siempre 180px arriba de la nave, suavizado
+            var persTargetY = naveY - 700;
             persY = lerp(persY, persTargetY, 0.025);
 
+            // Clamp perseguidora dentro de pantalla (mitad del elemento = 600)
+            var persHalf = 600;
             var clampedPersX = Math.max(persHalf, Math.min(window.innerWidth  - persHalf, persX));
             var clampedPersY = Math.max(persHalf, Math.min(window.innerHeight - persHalf, persY));
             persEl.style.left = (clampedPersX - persHalf) + 'px';
